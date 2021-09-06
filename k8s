@@ -1,0 +1,120 @@
+Kubernetes K8S
+ 
+
+Master node and components: 
+4 process runs on every master node
+
+Control Plane
+1.	Kube-api-servers - primary - interact first - frontend for k8s – 
+•	cluster gateway – gets initials request from client regarding updates or query(the status of deployments or health of a cluster etc) from cluster.
+•	 Acts as a gatekeeper for authentication. 
+2.	kube-scheduler
+•	schedule new pod -> API server -> Scheduler - > where to put the pod?-> kubelet
+•	Scheduler decide on which node new pod should be scheduled  
+•	Worker nodes get request from scheduler and execute the request using kubelet 
+3.	kube-controller-manager 
+a.	detect cluster change state like pods die tries to recover the cluster state asap.
+b.	Control-Manger -> scheduler (to re-schedule those dead pods) -> kubelets
+4.	Etcd(cluster brain) -  backend data store - perform operation 
+•	Etcd is a cluster brain 
+•	Cluster changes get stored in the key value store 
+
+Node components:
+•	Containers or pods
+•	services (external or internal):
+	service has 2 functionalities. 
+•	Permanent IP 
+•	Load Balancer
+•	ingress (https://my-apps.com), 
+•	secret
+•	configMap (external configuration)
+Volumes:
+Deployments and stateful sets (database applications)
+•	In order to avoid data inconsistence and replicating feature is provided by other k8s component called stateful set 
+•	MySql, MongoDB, elastic search and much more databases should be created using stateful sets but not deployments 
+•	Deployments for stateless apps. 
+Main K8s components summarized:
+Pods – abstractions and containers
+Services – communication 
+Ingress – route traffic into cluster 
+configMaps – external configurations 
+secrets – to store secret keys like username and password
+volumes – volumes or storage 
+Deployments and Stateful sets – Pod Blue Prints with replicating mechanism 
+ Worker Machine in K8s cluster:
+1.	Each node has multiple pods on it 
+2.	3 processes must be installed on every node 
+3.	Worker nodes do the actual work 
+1st process – container runtime (dockers)
+2nd process – kubelet – interacts with both container and node itself. Kebelet starts the pod with the container inside
+3rd process – kube proxy – forward request from services to pods. 
+What is minikube?
+ 
+•	Create VM on your laptop 
+•	Node runs in the Virtual Machine 
+•	1 node k8s cluster 
+•	For testing purposes
+minikube start --vm-driver=hyperkit
+
+What is Kubectl?
+CLI tools for K8s cluster 
+ 
+
+Kubectl create deployment NAME --image=image [--dry-run] [options]
+kubectl create deployment nginx-depl --image=nginx
+kubectl get deployments
+kubectl get pods
+kubectl get replicaset
+ 
+Layers of Abstraction:
+Deployments -> Replicaset -> Pod -> Container
+Kubectl edit deployment nginx-depl
+Debug K8s:
+Kubectl logs [pod-name]
+kubectl create deployment mongo-depl --image=mongo 
+kubectl logs mongo-depl-5fd6b7d4b4-5v7w5
+kubectl describe pod [pod-name]
+kubectl exec -it [pod-name] -- bin/bash
+kubectl exec -it mongo-depl-5fd6b7d4b4-5v7w5 – bin/bash
+kubectl delete deployment [deployment-name]
+kubectl delete deployment mongo-depl
+
+nginx-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.16
+        ports:
+        - containerPort: 8080
+
+YAML configuration file in K8s:
+3 parts of configuration file
+ 
+*Attributes of “specs” are specific to the “kind” *
+3rd part is “status”
+Connecting Components: (Labels and Selectors and Ports)
+ 
+Metadata contains labels, Specs contain selectors
+kubectl apply -f nginx-deployment.yaml
+kubectl apply -f nginx-services.yaml
+kubectl describe service nginx-service
+kubectl get pod -o wide  
+kubectl get deployment nginx-deployment -o yaml
+TASK MONGOExpress and MONGODB
+	
+
